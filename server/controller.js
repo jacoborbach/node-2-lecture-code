@@ -23,11 +23,11 @@ module.exports = {
     updateBook: (req, res) => {
         const { id } = req.params;
         //+id changes a string id into a number id
-        let editBook = books.find(element => element.id === +id);
-        editBook = {
-            id: editBook.id,
-            title: req.body.title || editBook.title,
-            author: req.body.author || editBook.author
+        let editBookIndex = books.findIndex(element => element.id === +id);
+        books[editBookIndex] = {
+            id: books[editBookIndex].id,
+            title: req.body.title || books[editBookIndex].title,
+            author: req.body.author || books[editBookIndex].author
         }
 
         res.sendStatus(200);
@@ -39,6 +39,6 @@ module.exports = {
         let bookId = books.findIndex(element => element.id === +id);
         books.splice(bookId, 1)
 
-        req.sendStatus(200);
+        res.sendStatus(200);
     }
 }

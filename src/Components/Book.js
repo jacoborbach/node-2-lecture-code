@@ -1,7 +1,8 @@
-import {Component} from 'react';
+import { Component } from 'react';
+import axios from 'axios';
 
 class Book extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             title: this.props.book.title,
@@ -21,34 +22,45 @@ class Book extends Component {
 
     toggleView = () => {
         //this will change state based on it's current value, toggling from true to false
-        if(this.state.editView){
-            this.setState({editView: false})
+        if (this.state.editView) {
+            this.setState({ editView: false })
         } else {
-            this.setState({editView: true})
+            this.setState({ editView: true })
         }
     }
 
     updateBook = () => {
-        //code here
+        axios.put(`/api/book/${this.props.book.id}`, { title: this.state.title, author: this.state.author })
+            .then(() => {
+                this.props.getBooksFn();
+                this.setState({
+                    title: '',
+                    author: '',
+                    editView: false
+                })
+            })
+            .catch(err => console.log(err));
     }
 
     deleteBook = () => {
-        //code here
+        axios.delete(`/api/book/${this.props.book.id}`)
+            .then(() => this.props.getBooksFn())
+            .catch(err => console.log(err));
     }
 
-    render(){
+    render() {
         //destructuring makes using state and props values easier
-        const {title, author, editView} = this.state;
-        const {book} = this.props;
+        const { title, author, editView } = this.state;
+        const { book } = this.props;
 
         return (
             <section>
                 {editView
                     ? (
                         <section>
-                            <input value={title} name='title' onChange={e => this.handleInputs(e)}/>
-                            <input value={author} name='author' onChange={e => this.handleInputs(e)}/>
-                            <button onClick={this.toggleView}>Submit</button>
+                            <input value={title} name='title' onChange={e => this.handleInputs(e)} />
+                            <input value={author} name='author' onChange={e => this.handleInputs(e)} />
+                            <button onClick={this.updateBook}>Submit</button>
                         </section>
                     )
                     : (
@@ -56,9 +68,9 @@ class Book extends Component {
                             <h3>{book.title}</h3>
                             <h4>{book.author}</h4>
                             <button onClick={this.toggleView}>Edit</button>
-                            <button>Delete</button> 
+                            <button onClick={this.deleteBook}>Delete</button>
                         </section>
-                    )}   
+                    )}
             </section>
         )
     }
